@@ -1,3 +1,5 @@
+const Room = require('../models/roomModel');
+
 const allRooms = async (req, res) => {
   try {
     const rooms = await Room.find();

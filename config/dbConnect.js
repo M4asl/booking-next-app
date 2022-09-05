@@ -1,18 +1,16 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-const dbConnect = () => {
-  if (mongoose.connection.readyState >= 1) {
-    return;
-  }
-
-  mongoose
-    .connect(process.env.DB_URI, {
+async function connectDb() {
+  try {
+    await mongoose.connect(`${process.env.MONGODB_URI}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-    })
-    .then((con) => console.log('connected to local database.'));
-};
+    });
+    console.log('>> Mongodb connected');
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+}
 
-export default dbConnect;
+module.exports = connectDb;
