@@ -5,12 +5,14 @@ const dbConnect = () => {
     return;
   }
 
-  mongoose.connect(process.env.DB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true,
-  });
+  mongoose
+    .connect(process.env.DB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+    })
+    .then((con) => console.log('connected to local database.'));
 };
 
 export default dbConnect;
