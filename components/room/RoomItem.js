@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 
-const RoomItem = () => {
+const RoomItem = ({ room }) => {
   return (
     <div
       style={{
@@ -11,6 +11,7 @@ const RoomItem = () => {
         borderRadius: '10px',
         boxShadow: '3px 3px 10px rgba(0,102,102,50)',
         padding: '10px 0px',
+        margin: '20px',
       }}
     >
       <div
@@ -25,7 +26,7 @@ const RoomItem = () => {
       >
         <Image
           alt="Room"
-          src="/images/room1.jpg"
+          src={room.images[0].url}
           width={240}
           height={200}
         />
@@ -34,7 +35,6 @@ const RoomItem = () => {
         style={{
           width: '195px',
           height: '95px',
-          // border: '1px solid white',
           margin: '0 auto',
           marginTop: '15px',
         }}
@@ -46,7 +46,7 @@ const RoomItem = () => {
             letterSpacing: '2px',
           }}
         >
-          Minimalism Room
+          {room.name.slice(0, 20)}
         </h6>
         <div
           style={{
@@ -70,7 +70,7 @@ const RoomItem = () => {
                 letterSpacing: '1px',
               }}
             >
-              $12.50/night
+              ${room.pricePerNight}/night
             </span>
           </div>
           <span
@@ -80,7 +80,7 @@ const RoomItem = () => {
               letterSpacing: '1px',
             }}
           >
-            Phu Nhuan
+            {room.address.slice(0, 10)}
           </span>
         </div>
         <div
@@ -110,7 +110,7 @@ const RoomItem = () => {
                 marginLeft: '10px',
               }}
             >
-              1
+              {room.numOfBeds}
             </span>
           </div>
           <div
@@ -154,7 +154,7 @@ const RoomItem = () => {
                 marginLeft: '10px',
               }}
             >
-              5.0
+              {room.numOfReviews}
             </span>
           </div>
         </div>

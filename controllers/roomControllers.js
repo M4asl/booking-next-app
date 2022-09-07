@@ -1,4 +1,5 @@
 import catchAsyncErrors from '../middlewares/catchAsyncErrors';
+import APIFeatures from '../utils/apiFeatures';
 
 const Room = require('../models/roomModel');
 
@@ -11,13 +12,12 @@ const allRooms = catchAsyncErrors(async (req, res) => {
 
   const apiFeatures = new APIFeatures(Room.find(), req.query)
     .search()
-    .filter();
+    .filter()
+    .pagination(resPerPage);
 
   let rooms = await apiFeatures.query;
-  let filteredRoomsCount = rooms.length;
 
-  apiFeatures.pagination(resPerPage);
-  rooms = await apiFeatures.query;
+  let filteredRoomsCount = rooms.length;
 
   res.status(200).json({
     success: true,
