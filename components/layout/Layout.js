@@ -3,6 +3,9 @@ import React from 'react';
 import Footer from './Footer';
 import Header from './Header';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const Layout = ({
   children,
   title = 'Book Best Rooms for your trip',
@@ -18,6 +21,7 @@ const Layout = ({
         />
       </Head>
       <Header />
+      <ToastContainer position="bottom-right" />
       {children}
       <Footer />
     </div>
