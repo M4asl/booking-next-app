@@ -5,6 +5,8 @@ import {
   ALL_ROOMS_SUCCESS,
   ALL_ROOMS_FAIL,
   CLEAR_ERRORS,
+  ROOM_DETAILS_SUCCESS,
+  ROOM_DETAILS_FAIL,
 } from '../constants/roomConstants';
 
 // Get all rooms
