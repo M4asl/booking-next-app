@@ -54,3 +54,9 @@ export const getRoomDetails = (req, id) => async (dispatch) => {
     });
   }
 };
+
+export const clearErrors = () => async (dispatch) => {
+  dispatch({
+    type: CLEAR_ERRORS,
+  });
+};
