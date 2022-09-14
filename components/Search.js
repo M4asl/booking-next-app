@@ -23,7 +23,7 @@ const Search = () => {
   return (
     <div className="container container-fluid">
       <div className="row wrapper">
-        <div className="col-10 col-lg-5">
+        <div className="col-10 col-lg-5 mx-auto">
           <form className="shadow-lg" onSubmit={submitHandler}>
             <h2 className="my-5">Search Rooms</h2>
             <div className="form-group">
