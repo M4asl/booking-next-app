@@ -1,12 +1,7 @@
-import User from '../models/user';
+import User from '../models/userModel';
 import cloudinary from 'cloudinary';
 
-import ErrorHandler from '../utils/errorHandler';
 import catchAsyncErrors from '../middlewares/catchAsyncErrors';
-import sendEmail from '../utils/sendEmail';
-
-import absoluteUrl from 'next-absolute-url';
-import crypto from 'crypto';
 
 // Setting up cloudinary config
 cloudinary.config({
@@ -20,7 +15,7 @@ const registerUser = catchAsyncErrors(async (req, res) => {
   const result = await cloudinary.v2.uploader.upload(
     req.body.avatar,
     {
-      folder: 'bookit/avatars',
+      folder: 'bookingApp/avatars',
       width: '150',
       crop: 'scale',
     }
