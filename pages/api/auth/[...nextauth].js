@@ -43,12 +43,16 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    jwt: async (token, user) => {
+    jwt: async ({ token, user }) => {
+      // Persist the OAuth access_token to the token right after signin
+
       user && (token.user = user);
       return Promise.resolve(token);
     },
-    session: async (session, user) => {
-      session.user = user.user;
+    session: async ({ session, token, user }) => {
+      // Send properties to the client, like an access_token from a provider.
+
+      session.user = token.user;
       return Promise.resolve(session);
     },
   },
