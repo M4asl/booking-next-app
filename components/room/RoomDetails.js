@@ -1,12 +1,113 @@
 import Image from 'next/image';
-import React from 'react';
-import { useSelector } from 'react-redux';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { HiOutlineHome } from 'react-icons/hi';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { Carousel } from 'react-bootstrap';
 import RoomFacilities from './RoomFacilities';
+import {
+  checkBooking,
+  clearErrors,
+  getBookedDates,
+} from '../../redux/actions/bookingActions';
+import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
+import { CHECK_BOOKING_RESET } from '../../redux/constants/bookingConstants';
 
 const RoomDetails = ({ title }) => {
+  const [checkInDate, setCheckInDate] = useState();
+  const [checkOutDate, setCheckOutDate] = useState();
+  const [daysOfStay, setDaysOfStay] = useState();
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const { dates } = useSelector((state) => state.bookedDates);
+  const { user } = useSelector((state) => state.loadedUser);
   const { room, error } = useSelector((state) => state.roomDetails);
+  const { available, loading: bookingLoading } = useSelector(
+    (state) => state.checkBooking
+  );
+
+  const excludedDates = [];
+  dates.forEach((date) => {
+    excludedDates.push(new Date(date));
+  });
+
+  const onChange = (dates) => {
+    const [checkInDate, checkOutDate] = dates;
+
+    setCheckInDate(checkInDate);
+    setCheckOutDate(checkOutDate);
+
+    if (checkInDate && checkOutDate) {
+      // Calclate days of stay
+
+      const days = Math.floor(
+        (new Date(checkOutDate) - new Date(checkInDate)) / 86400000 +
+          1
+      );
+
+      setDaysOfStay(days);
+
+      dispatch(
+        checkBooking(
+          id,
+          checkInDate.toISOString(),
+          checkOutDate.toISOString()
+        )
+      );
+    }
+  };
+
+  const { id } = router.query;
+
+  const newBookingHandler = async () => {
+    const bookingData = {
+      room: router.query.id,
+      checkInDate,
+      checkOutDate,
+      daysOfStay,
+      amountPaid: 90,
+      paymentInfo: {
+        id: 'STRIPE_PAYMENT_ID',
+        status: 'STRIPE_PAYMENT_STATUS',
+      },
+    };
+
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      const { data } = await axios.post(
+        '/api/bookings',
+        bookingData,
+        config
+      );
+
+      console.log(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(getBookedDates(id));
+
+    toast.error(error);
+    dispatch(clearErrors());
+
+    return () => {
+      dispatch({ type: CHECK_BOOKING_RESET });
+    };
+  }, [dispatch, id]);
+
   return (
     <div
       style={{
@@ -204,31 +305,105 @@ const RoomDetails = ({ title }) => {
           </div>
         </div>
       </div>
-      <div style={{ width: '90%', margin: '100px auto 0 auto' }}>
-        <h3 style={{ fontWeight: 'lighter', letterSpacing: '3px' }}>
-          Description
-        </h3>
-        <div
-          style={{
-            width: '500px',
-            fontWeight: 'lighter',
-            lineHeight: '2',
-            letterSpacing: '2px',
-            marginTop: '30px',
-          }}
-        >
-          {room.description}
+      <div
+        style={{
+          width: '90%',
+          margin: '100px auto 0 auto',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div>
+          <h3 style={{ fontWeight: 'lighter', letterSpacing: '3px' }}>
+            Description
+          </h3>
+          <div
+            style={{
+              width: '500px',
+              fontWeight: 'lighter',
+              lineHeight: '2',
+              letterSpacing: '2px',
+              marginTop: '30px',
+            }}
+          >
+            {room.description}
+          </div>
+          <h3
+            style={{
+              marginTop: '50px',
+              fontWeight: 'lighter',
+              letterSpacing: '3px',
+            }}
+          >
+            Facilities
+          </h3>
+          <RoomFacilities room={room} />
         </div>
-        <h3
-          style={{
-            marginTop: '50px',
-            fontWeight: 'lighter',
-            letterSpacing: '3px',
-          }}
-        >
-          Facilities
-        </h3>
-        <RoomFacilities room={room} />
+        <div className="py-4">
+          <p
+            style={{
+              fontWeight: 'lighter',
+              letterSpacing: '3px',
+            }}
+          >
+            ${room.pricePerNight} / night
+          </p>
+
+          <hr />
+
+          <p
+            className="mt-5 mb-3"
+            style={{
+              fontWeight: 'lighter',
+              letterSpacing: '3px',
+            }}
+          >
+            Pick Check In & Check Out Date
+          </p>
+
+          <DatePicker
+            className="w-100"
+            selected={checkInDate}
+            onChange={onChange}
+            startDate={checkInDate}
+            endDate={checkOutDate}
+            minDate={new Date()}
+            excludeDates={excludedDates}
+            selectsRange
+            inline
+          />
+
+          {available === true && (
+            <div className="alert alert-success my-3 font-weight-bold">
+              Room is available. Book now.
+            </div>
+          )}
+
+          {available === false && (
+            <div className="alert alert-danger my-3 font-weight-bold">
+              Room not available. Try different dates.
+            </div>
+          )}
+
+          {available && !user && (
+            <div className="alert alert-danger my-3 font-weight-bold">
+              Login to book room.
+            </div>
+          )}
+
+          {available && user && (
+            <button
+              className="btn btn-block py-2 booking-btn"
+              style={{ backgroundColor: '#eea86c', color: 'white' }}
+              onClick={newBookingHandler}
+              disabled={
+                bookingLoading || paymentLoading ? true : false
+              }
+            >
+              Pay - ${daysOfStay * room.pricePerNight}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
