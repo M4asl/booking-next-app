@@ -15,6 +15,7 @@ import {
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import { CHECK_BOOKING_RESET } from '../../redux/constants/bookingConstants';
+import getStripe from '../../utils/getStripe';
 
 const RoomDetails = ({ title }) => {
   const [checkInDate, setCheckInDate] = useState();
@@ -94,6 +95,30 @@ const RoomDetails = ({ title }) => {
       console.log(data);
     } catch (error) {
       console.log(error.response);
+    }
+  };
+
+  const bookRoom = async (id, pricePerNight) => {
+    setPaymentLoading(true);
+
+    const amount = pricePerNight * daysOfStay;
+
+    try {
+      const link = `/api/checkout_session/${id}?checkInDate=${checkInDate.toISOString()}&checkOutDate=${checkOutDate.toISOString()}&daysOfStay=${daysOfStay}`;
+
+      const { data } = await axios.get(link, { params: { amount } });
+
+      const stripe = await getStripe();
+
+      // Redirect to checkout
+      // stripe.redirectToCheckout({ sessionId: data.id });
+      window.location.replace(data.url);
+
+      setPaymentLoading(false);
+    } catch (error) {
+      setPaymentLoading(false);
+      console.log(error);
+      toast.error(error.message);
     }
   };
 
@@ -395,7 +420,7 @@ const RoomDetails = ({ title }) => {
             <button
               className="btn btn-block py-2 booking-btn"
               style={{ backgroundColor: '#eea86c', color: 'white' }}
-              onClick={newBookingHandler}
+              onClick={() => bookRoom(room._id, room.pricePerNight)}
               disabled={
                 bookingLoading || paymentLoading ? true : false
               }

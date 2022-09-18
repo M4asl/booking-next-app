@@ -7,7 +7,6 @@ const getStripe = () => {
     stripePromise = loadStripe(`${process.env.STRIPE_API_KEY}`);
   }
 
-  console.log(stripePromise);
   return stripePromise;
 };
 
