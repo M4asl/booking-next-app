@@ -12,6 +12,7 @@ import {
   clearErrors,
   getBookedDates,
 } from '../../redux/actions/bookingActions';
+import NewReview from '../review/createReview';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import { CHECK_BOOKING_RESET } from '../../redux/constants/bookingConstants';
@@ -430,6 +431,7 @@ const RoomDetails = ({ title }) => {
           )}
         </div>
       </div>
+      <NewReview />
     </div>
   );
 };
