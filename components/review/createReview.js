@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { AiFillStar } from 'react-icons/ai';
 
 import { toast } from 'react-toastify';
+import { AiFillStar } from 'react-icons/ai';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
   newReview,
+  checkReviewAvailability,
   clearErrors,
 } from '../../redux/actions/roomActions';
 import { NEW_REVIEW_RESET } from '../../redux/constants/roomConstants';
@@ -19,10 +20,17 @@ const NewReview = () => {
   const router = useRouter();
 
   const { error, success } = useSelector((state) => state.newReview);
+  const { reviewAvailable } = useSelector(
+    (state) => state.checkReview
+  );
 
   const { id } = router.query;
 
   useEffect(() => {
+    if (id !== undefined) {
+      dispatch(checkReviewAvailability(id));
+    }
+
     if (error) {
       toast.error(error);
       dispatch(clearErrors());
@@ -47,7 +55,6 @@ const NewReview = () => {
   };
 
   function setUserRatings() {
-    console.log('hey');
     const stars = document.querySelectorAll('.star');
 
     stars.forEach((star, index) => {
@@ -62,24 +69,24 @@ const NewReview = () => {
       stars.forEach((star, index) => {
         if (e.type === 'click') {
           if (index < this.starValue) {
-            star.classList.add('orange');
+            star.classList.add('red');
 
             setRating(this.starValue);
           } else {
-            star.classList.remove('oragne');
+            star.classList.remove('red');
           }
         }
 
         if (e.type === 'mouseover') {
           if (index < this.starValue) {
-            star.classList.add('light-orange');
+            star.classList.add('light-red');
           } else {
-            star.classList.remove('light-orange');
+            star.classList.remove('light-red');
           }
         }
 
         if (e.type === 'mouseout') {
-          star.classList.remove('light-orange');
+          star.classList.remove('light-red');
         }
       });
     }
@@ -87,17 +94,19 @@ const NewReview = () => {
 
   return (
     <div className="mx-auto" style={{ width: '90%' }}>
-      <button
-        id="review_btn"
-        type="button"
-        className="btn btn-primary mt-4 mb-5"
-        data-toggle="modal"
-        data-target="#ratingModal"
-        style={{ backgroundColor: '#eea86c' }}
-        onClick={setUserRatings}
-      >
-        Submit Your Review
-      </button>
+      {reviewAvailable && (
+        <button
+          id="review_btn"
+          type="button"
+          className="btn btn-primary mt-4 mb-5"
+          data-toggle="modal"
+          data-target="#ratingModal"
+          style={{ backgroundColor: '#eea86c' }}
+          onClick={setUserRatings}
+        >
+          Submit Your Review
+        </button>
+      )}
       <div
         className="modal fade"
         id="ratingModal"
