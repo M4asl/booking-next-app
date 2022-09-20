@@ -17,6 +17,7 @@ import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import { CHECK_BOOKING_RESET } from '../../redux/constants/bookingConstants';
 import getStripe from '../../utils/getStripe';
+import ListReviews from '../review/ListReviews';
 
 const RoomDetails = ({ title }) => {
   const [checkInDate, setCheckInDate] = useState();
@@ -432,6 +433,13 @@ const RoomDetails = ({ title }) => {
         </div>
       </div>
       <NewReview />
+      {room.reviews && room.reviews.length > 0 ? (
+        <ListReviews reviews={room.reviews} />
+      ) : (
+        <p>
+          <b>No Reviews on this room</b>
+        </p>
+      )}
     </div>
   );
 };
