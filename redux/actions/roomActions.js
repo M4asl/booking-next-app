@@ -13,6 +13,12 @@ import {
   REVIEW_AVAILABILITY_REQUEST,
   REVIEW_AVAILABILITY_SUCCESS,
   REVIEW_AVAILABILITY_FAIL,
+  ADMIN_ROOMS_REQUEST,
+  ADMIN_ROOMS_SUCCESS,
+  ADMIN_ROOMS_FAIL,
+  NEW_ROOM_REQUEST,
+  NEW_ROOM_SUCCESS,
+  NEW_ROOM_FAIL,
 } from '../constants/roomConstants';
 
 // Get all rooms
@@ -56,6 +62,27 @@ export const getRoomDetails = (req, id) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: ROOM_DETAILS_FAIL,
+      payload: error.response.data.message,
+    });
+  }
+};
+
+// Get all rooms - ADMIN
+export const getAdminRooms = () => async (dispatch) => {
+  try {
+    dispatch({ type: ADMIN_ROOMS_REQUEST });
+
+    const { data } = await axios.get(`/api/admin/rooms`);
+
+    dispatch({
+      type: ADMIN_ROOMS_SUCCESS,
+      payload: data.rooms,
+    });
+  } catch (error) {
+    console.log(error);
+
+    dispatch({
+      type: ADMIN_ROOMS_FAIL,
       payload: error.response.data.message,
     });
   }
@@ -109,6 +136,30 @@ export const checkReviewAvailability =
       });
     }
   };
+
+export const newRoom = (roomData) => async (dispatch) => {
+  try {
+    dispatch({ type: NEW_ROOM_REQUEST });
+
+    const config = {
+      header: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const { data } = await axios.post(`/api/rooms`, roomData, config);
+
+    dispatch({
+      type: NEW_ROOM_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: NEW_ROOM_FAIL,
+      payload: error.response.data.message,
+    });
+  }
+};
 
 export const clearErrors = () => async (dispatch) => {
   dispatch({
