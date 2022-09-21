@@ -1,5 +1,6 @@
 import catchAsyncErrors from '../middlewares/catchAsyncErrors';
 import APIFeatures from '../utils/apiFeatures';
+import cloudinary from 'cloudinary';
 
 const Room = require('../models/roomModel');
 
@@ -28,12 +29,32 @@ const allRooms = catchAsyncErrors(async (req, res) => {
   });
 });
 
-// Create new room => /api/rooms
+// Create new room   =>   /api/rooms
+const newRoom = catchAsyncErrors(async (req, res) => {
+  const images = req.body.images;
 
-const createRoom = catchAsyncErrors(async (req, res) => {
+  let imagesLinks = [];
+
+  for (let i = 0; i < images.length; i++) {
+    const result = await cloudinary.v2.uploader.upload(images[i], {
+      folder: 'bookit/rooms',
+    });
+
+    imagesLinks.push({
+      public_id: result.public_id,
+      url: result.secure_url,
+    });
+  }
+
+  req.body.images = imagesLinks;
+  req.body.user = req.user._id;
+
   const room = await Room.create(req.body);
 
-  res.status(201).json(room);
+  res.status(200).json({
+    success: true,
+    room,
+  });
 });
 
 // Get room details   =>   /api/rooms/:id
@@ -154,12 +175,23 @@ const checkReviewAvailability = catchAsyncErrors(async (req, res) => {
   });
 });
 
+// Get all rooms - ADMIN   =>   /api/admin/rooms
+const allAdminRooms = catchAsyncErrors(async (req, res) => {
+  const rooms = await Room.find();
+
+  res.status(200).json({
+    success: true,
+    rooms,
+  });
+});
+
 export {
   allRooms,
-  createRoom,
+  newRoom,
   getSingleRoom,
   updateRoom,
   deleteRoom,
   createRoomReview,
   checkReviewAvailability,
+  allAdminRooms,
 };
