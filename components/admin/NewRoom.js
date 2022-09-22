@@ -309,6 +309,7 @@ const NewRoom = () => {
             <button
               type="submit"
               className="btn btn-block new-room-btn py-3"
+              style={{ backgroundColor: '#006666' }}
               disabled={loading ? true : false}
             >
               {loading ? <ButtonLoader /> : 'CREATE'}
