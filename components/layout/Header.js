@@ -14,7 +14,7 @@ const Header = () => {
     if (!user) {
       dispatch(loadUser());
     }
-  }, [dispatch, user]);
+  }, []);
 
   const logoutHandler = () => {
     signOut();
