@@ -23,6 +23,9 @@ import {
   ADMIN_USERS_SUCCESS,
   ADMIN_USERS_FAIL,
   CLEAR_ERRORS,
+  USER_DETAILS_REQUEST,
+  USER_DETAILS_SUCCESS,
+  USER_DETAILS_FAIL,
 } from '../constants/userConstants';
 
 export const authReducer = (state = { user: null }, action) => {
