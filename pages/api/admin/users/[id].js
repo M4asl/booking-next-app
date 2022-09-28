@@ -24,4 +24,8 @@ handler
   .use(isAuthenticatedUser, authorizeRoles('admin'))
   .put(updateUser);
 
+handler
+  .use(isAuthenticatedUser, authorizeRoles('admin'))
+  .delete(deleteUser);
+
 export default handler;
