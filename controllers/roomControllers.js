@@ -207,6 +207,16 @@ const allAdminRooms = catchAsyncErrors(async (req, res) => {
   });
 });
 
+// Get all room reviews - ADMIN   =>   /api/reviews
+const getRoomReviews = catchAsyncErrors(async (req, res) => {
+  const room = await Room.findById(req.query.id);
+
+  res.status(200).json({
+    success: true,
+    reviews: room.reviews,
+  });
+});
+
 export {
   allRooms,
   newRoom,
@@ -216,4 +226,5 @@ export {
   createRoomReview,
   checkReviewAvailability,
   allAdminRooms,
+  getRoomReviews,
 };
