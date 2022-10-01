@@ -3,6 +3,7 @@ import dbConnect from '../../../config/dbConnect';
 
 import {
   createRoomReview,
+  deleteReview,
   getRoomReviews,
 } from '../../../controllers/roomControllers';
 
@@ -16,5 +17,7 @@ dbConnect();
 handler.use(isAuthenticatedUser).put(createRoomReview);
 
 handler.use(isAuthenticatedUser).get(getRoomReviews);
+
+handler.use(isAuthenticatedUser).delete(deleteReview);
 
 export default handler;
