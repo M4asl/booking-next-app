@@ -8,8 +8,10 @@ import { toast } from 'react-toastify';
 
 import {
   getRoomReviews,
+  deleteReview,
   clearErrors,
 } from '../../redux/actions/roomActions';
+import { DELETE_REVIEW_RESET } from '../../redux/constants/roomConstants';
 
 const RoomReviews = () => {
   const [roomId, setRoomId] = useState('');
@@ -19,6 +21,9 @@ const RoomReviews = () => {
 
   const { loading, error, reviews } = useSelector(
     (state) => state.roomReviews
+  );
+  const { error: deleteError, isDeleted } = useSelector(
+    (state) => state.review
   );
 
   useEffect(() => {
@@ -30,7 +35,16 @@ const RoomReviews = () => {
     if (roomId !== '') {
       dispatch(getRoomReviews(roomId));
     }
-  }, [dispatch, error, roomId]);
+    if (deleteError) {
+      toast.error(deleteError);
+      dispatch(clearErrors());
+    }
+
+    if (isDeleted) {
+      toast.success('Review is deleted.');
+      dispatch({ type: DELETE_REVIEW_RESET });
+    }
+  }, [dispatch, error, roomId, deleteError, isDeleted]);
 
   const setReviews = () => {
     const data = {
@@ -72,7 +86,10 @@ const RoomReviews = () => {
           comment: review.comment,
           user: review.name,
           actions: (
-            <button className="btn btn-danger mx-2">
+            <button
+              className="btn btn-danger mx-2"
+              onClick={() => deleteReviewHandler(review._id)}
+            >
               <i className="fa fa-trash"></i>
             </button>
           ),
@@ -80,6 +97,10 @@ const RoomReviews = () => {
       });
 
     return data;
+  };
+
+  const deleteReviewHandler = (id) => {
+    dispatch(deleteReview(id, roomId));
   };
 
   return (
@@ -90,7 +111,7 @@ const RoomReviews = () => {
             <div className="form-group">
               <label htmlFor="roomId_field">Enter Room ID</label>
               <input
-                type="email"
+                type="text"
                 id="roomId_field"
                 className="form-control"
                 value={roomId}
